@@ -5,7 +5,6 @@ import com.ly.domain.Product;
 import com.ly.product.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +16,27 @@ public class ProductController {
 
     @Autowired
     private ProductService productrService;
+
+    @RequestMapping("/api1/demo1")
+    public String apiDemo1(){
+        return "demo1";
+    }
+
+    @RequestMapping("/api1/demo2")
+    public String apiDemo2(){
+        return "demo2";
+    }
+
+    @RequestMapping("/api2/demo3")
+    public String apiDemo3(){
+        return "demo3";
+    }
+
+    @RequestMapping("/api2/demo4")
+    public String apiDemo4(){
+        return "demo1";
+    }
+
 
     @RequestMapping("/get/{pid}")
     public Product get(@PathVariable("pid") Integer pid){

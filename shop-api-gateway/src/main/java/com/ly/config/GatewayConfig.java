@@ -1,5 +1,10 @@
 package com.ly.config;
 
+import com.alibaba.csp.sentinel.adapter.gateway.common.SentinelGatewayConstants;
+import com.alibaba.csp.sentinel.adapter.gateway.common.api.ApiDefinition;
+import com.alibaba.csp.sentinel.adapter.gateway.common.api.ApiPathPredicateItem;
+import com.alibaba.csp.sentinel.adapter.gateway.common.api.ApiPredicateItem;
+import com.alibaba.csp.sentinel.adapter.gateway.common.api.GatewayApiDefinitionManager;
 import com.alibaba.csp.sentinel.adapter.gateway.common.rule.GatewayFlowRule;
 import com.alibaba.csp.sentinel.adapter.gateway.common.rule.GatewayRuleManager;
 import com.alibaba.csp.sentinel.adapter.gateway.sc.SentinelGatewayFilter;
@@ -41,11 +46,18 @@ public class GatewayConfig {
     @PostConstruct
     public void initGatewayRules(){
         Set<GatewayFlowRule> rules = new HashSet<>();
-        rules.add(
+
+        //路由限流规则
+        /*rules.add(
                 new GatewayFlowRule("shop-product-route")
                     .setCount(1)//限流阈值
                     .setIntervalSec(1)//统计时间窗口，秒
-        );
+        );*/
+
+        //API限流规则
+        rules.add(new GatewayFlowRule("product_api1").setCount(1).setIntervalSec(1));
+        rules.add(new GatewayFlowRule("product_api2").setCount(1).setIntervalSec(1));
+
         GatewayRuleManager.loadRules(rules);
     }
 
@@ -76,5 +88,25 @@ public class GatewayConfig {
             }
         };
         GatewayCallbackManager.setBlockHandler(blockRequestHandler);
+    }
+
+    //自定义API分组
+    @PostConstruct
+    public void initCustomizedApis(){
+        Set<ApiDefinition> apiDefinitions = new HashSet<>();
+        ApiDefinition product_api1 = new ApiDefinition("product_api1")
+                .setPredicateItems(new HashSet<ApiPredicateItem>() {{
+                    add(new ApiPathPredicateItem()
+                            .setPattern("/product_service/product/api1/**")
+                            .setMatchStrategy(SentinelGatewayConstants.URL_MATCH_STRATEGY_PREFIX));
+                }});
+        ApiDefinition product_api2 = new ApiDefinition("product_api2")
+                .setPredicateItems(new HashSet<ApiPredicateItem>() {{
+                    add(new ApiPathPredicateItem()
+                            .setPattern("/product_service/product/api2/demo3"));
+                }});
+        apiDefinitions.add(product_api1);
+        apiDefinitions.add(product_api2);
+        GatewayApiDefinitionManager.loadApiDefinitions(apiDefinitions);
     }
 }
